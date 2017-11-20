@@ -33,22 +33,23 @@ function positions = getPositions(dimension, slice)
   positions{2,1} = [];
   parts = slice;
   
-  means = zeros(parts,1);
+  sums = zeros(parts,1);
   interval = floor(length(dimension)/parts);
   pass = interval;
   init = 1;
   
   for i = 1:parts
-    means(i) = sum(dimension(init:pass)); 
+    sums(i) = sum(dimension(init:pass)); 
     init = pass;
     pass += interval;
   end
   
-  means;
+  sums;
+  threshold = 550;
   
   for i = 1:parts
-    if (means(i) > 100)
-      means(i);
+    if (sums(i) > threshold)
+      sums(i);
       i;
       if(i == 1)
         positions{1} = 1;
@@ -61,8 +62,8 @@ function positions = getPositions(dimension, slice)
   end
   
   for i = parts:-1:1
-    if (means(i) > 100)
-      means(i);
+    if (sums(i) > threshold)
+      sums(i);
       i;
       if(i == slice)
         positions{2} = length(dimension);
@@ -75,33 +76,70 @@ function positions = getPositions(dimension, slice)
   end
 end
 
+function getCuttedLetters(str)
+  #str = pwd();
+  letters = loadImages(cstrcat(str, '/base/'),'*.jpg');
+  parts = 50;
+
+  cuttedImages{length(letters),1} = [];
+
+  for idx = 1:length(letters)
+    binary_image = im2bw(letters{idx}, 0.90);
+    lines = sum(~binary_image');
+    lines = lines';
+    
+    vertical_positions = getPositions(lines, parts);
+    
+    cols = sum(~binary_image);
+    cols = cols';
+    
+    horizontal_positions = getPositions(cols, parts);
+    
+    #img_final = binary_image(vertical_positions{1}:vertical_positions{2}, horizontal_positions{1}:horizontal_positions{2});
+    img_final = letters{idx}(vertical_positions{1}:vertical_positions{2}, horizontal_positions{1}:horizontal_positions{2});
+    
+    #imshow(img_final);
+    
+    #imwrite(img_final,"imagem_saida","jpeg");
+    
+    cuttedImages{idx} = img_final;
+    
+  endfor
+
+  writeImages(cstrcat(str, '/base/'), cstrcat(str, '/base/out/'),'*.jpg', cuttedImages);
+
+endfunction
+
+function splitImages(str)
+  cuttedImages = loadImages(cstrcat(str, '/base/out/'),'*.jpg');
+  splitedImages = {};
+
+  images = dir([cstrcat(str, '/base/out/') '*.jpg']);
+
+  for idx = 1:length(cuttedImages)
+    image = cuttedImages{idx};
+    [m n] = size(image);
+    
+    grid = 3;
+    
+    step_m = floor(m/grid);
+    step_n = floor(n/grid);
+    
+    i = 1;
+    for idxM = 1:step_m-1:m
+      for idxN = 1:step_n-1:n
+        if(idxM + step_m <= m && idxN + step_n <= n)
+          splitedImages{i,1} = image(idxM:idxM+step_m, idxN:idxN+step_n);
+          
+          imwrite(splitedImages{i,1}, cstrcat(cstrcat(str, '\base\out\splited\'), cstrcat(num2str(i),images(idx).name )), "jpg");
+          i++;
+        endif
+      endfor
+    endfor
+    i = 0;
+  endfor
+endfunction
+
 str = pwd();
-letters = loadImages(cstrcat(str, '/base/'),'*.jpg');
-letters(1);
-parts = 100;
 
-cuttedImages{length(letters),1} = [];
-
-for idx = 1:length(letters)
-  binary_image = im2bw(letters{idx}, 0.90);
-  lines = sum(~binary_image');
-  lines = lines';
-  
-  vertical_positions = getPositions(lines, 100);
-  
-  cols = sum(~binary_image);
-  cols = cols';
-  
-  horizontal_positions = getPositions(cols, 100);
-  
-  img_final = binary_image(vertical_positions{1}:vertical_positions{2}, horizontal_positions{1}:horizontal_positions{2});
-  
-  #imshow(img_final);
-  
-  #imwrite(img_final,"imagem_saida","jpeg");
-  
-  cuttedImages{idx} = img_final;
-  
-end
-
-writeImages(cstrcat(str, '/base/'), cstrcat(str, '/base/out/'),'*.jpg', cuttedImages);
+main('feature_vector_lbq', strcat(str, '\base\out\splited\'));

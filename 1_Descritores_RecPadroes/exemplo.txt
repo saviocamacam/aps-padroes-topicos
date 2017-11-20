@@ -1,0 +1,1 @@
+main('descritores','/home/bertolini/Área de Trabalho/Rec_Padroes/imagens/')

@@ -120,7 +120,7 @@ function splitImages(str)
     image = cuttedImages{idx};
     [m n] = size(image);
     
-    grid = 3;
+    grid = 2;
     
     step_m = floor(m/grid);
     step_n = floor(n/grid);
@@ -142,4 +142,6 @@ endfunction
 
 str = pwd();
 
-main('feature_vector_lbq', strcat(str, '\base\out\splited\'));
+#splitImages(str);
+
+main('feature_vector_lpq', strcat(str, '\base\out\splited\'));

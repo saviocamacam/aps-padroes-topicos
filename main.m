@@ -51,7 +51,6 @@ for d = 3:length(dirListing)
 
                          %_Descritores
                          fprintf(fid, '%f ', H1 ); 
-                         fprintf(fid, '%i', n);
                          fprintf(fid,'\n');
                          
                          %_ROTULOS

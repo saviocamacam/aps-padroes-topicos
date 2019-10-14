@@ -2,11 +2,11 @@
 
 PYTHON_BIN=./environment/bin/python
 PIP_BIN=./environment/bin/pip
-REQUERIMENTS="./requeriments.txt"
+REQUIREMENTS="./requirements.txt"
 TEST_LIB_FILE="./test/orb_teste.py"
 ERROR=false
 
-readonly PYTHON_BIN TEST_LIB_FILE REQUERIMENTS
+readonly PYTHON_BIN TEST_LIB_FILE REQUIREMENTS
 
 ## Run a code of test 
 test_lib()
@@ -15,10 +15,10 @@ test_lib()
 	$PYTHON_BIN $TEST_LIB_FILE
 }
 
-## Install the libs contained in requeriments
+## Install the libs contained in requirements
 install_libs()
 {
-	$PIP_BIN install -r $REQUERIMENTS
+	$PIP_BIN install -r $REQUIREMENTS
 }
 
 if [ -z $1 ]; then
